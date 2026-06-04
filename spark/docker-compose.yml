@@ -1,0 +1,14 @@
+services:
+  spark-master:
+    image: bitnami/spark:3.5.1
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - "8080:8080" # Interfaz web del Master para ver el estado del clúster
+      - "7077:7077" # Puerto de comunicación para los Workers
+    volumes:
+      - ./app:/app # Aquí pondremos tu script de Python y el archivo data_masiva.csv

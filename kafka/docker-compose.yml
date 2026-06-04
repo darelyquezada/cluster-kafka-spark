@@ -1,0 +1,38 @@
+services:
+  kafka1:
+    image: bitnamilegacy/kafka:3.7.0
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_NODE_ID=1
+      # AGREGAR ESTA LÍNEA EXACTAMENTE IGUAL EN AMBOS NODOS:
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      # Ambos nodos en el Quorum
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@10.13.140.92:9093,2@10.13.140.189:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      # Tu IP física
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://10.13.140.92:9092
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      
+      # ==========================================
+      # AJUSTES INTERNOS PARA 1 SOLO NODO
+      # ==========================================
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=1
+  # ==========================================
+  # CLIENTE AUTOMATIZADO (Productor y Consumidor)
+  # ==========================================
+  app-cliente:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    # Agregamos un 'sleep 15' para darle tiempo a Kafka de inicializarse
+    command: sh -c "npm install kafkajs && sleep 15 && node index.js"
+    depends_on:
+      - kafka1
