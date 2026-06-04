@@ -9,9 +9,10 @@ services:
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
       - SPARK_SSL_ENABLED=no
-      - SPARK_MASTER_HOST=0.0.0.0 # Obliga a Spark a escuchar en tu IP física, no solo local
+      - SPARK_MASTER_HOST=0.0.0.0
+      - SPARK_MASTER_WEBUI_PORT=8081 # <--- AGREGA ESTA LÍNEA CRÍTICA
     ports:
-      - "8080:8081" # <--- CAMBIO CRÍTICO: Mapea el 8081 interno de Bitnami al 8080 de tu red física
+      - "8080:8081" # Mapea el 8081 interno de Bitnami al 8080 de tu Windows
       - "7077:7077" # Puerto de comunicación para los Workers
     volumes:
       - ./app:/app
