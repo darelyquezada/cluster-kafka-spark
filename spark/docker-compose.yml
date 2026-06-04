@@ -1,7 +1,7 @@
 services:
   # --- NODO MAESTRO DE SPARK ---
   spark-master:
-    image: bitnami/spark:3.5.1
+    image: bitnamilegacy/spark:3.5.1
     container_name: spark-master
     environment:
       - SPARK_MODE=master
@@ -9,19 +9,19 @@ services:
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
       - SPARK_SSL_ENABLED=no
+      - SPARK_MASTER_HOST=0.0.0.0 # Obliga a Spark a escuchar en tu IP física, no solo local
     ports:
-      - "8080:8080" # Interfaz web del Master para ver el estado del clúster
+      - "8080:8081" # <--- CAMBIO CRÍTICO: Mapea el 8081 interno de Bitnami al 8080 de tu red física
       - "7077:7077" # Puerto de comunicación para los Workers
     volumes:
-      - ./app:/app # Aquí pondremos tu script de Python y los archivos de datos
+      - ./app:/app
 
-  # --- CLIENTE AUTOMATIZADO (Igual que en Kafka) ---
+  # --- CLIENTE AUTOMATIZADO ---
   spark-cliente:
-    image: bitnami/spark:3.5.1
+    image: bitnamilegacy/spark:3.5.1
     container_name: spark-cliente
     volumes:
       - ./app:/app
-    # Le damos 10 segundos para asegurar que el master levantó bien su puerto 7077
     command: sh -c "sleep 10 && spark-submit --master spark://10.13.140.92:7077 /app/procesamiento.py"
     depends_on:
       - spark-master

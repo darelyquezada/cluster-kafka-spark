@@ -5,7 +5,7 @@ import re
 # 1. Iniciar sesión conectándose al nodo Maestro
 spark = SparkSession.builder \
     .appName("ProyectoDistribuidoSpark") \
-    .master("spark://10.13.140.92:7077") \
+    .master("spark://10.13.140.189:7077") \
     .getOrCreate()
 
 print("=====================================================")
