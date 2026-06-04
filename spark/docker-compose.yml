@@ -1,6 +1,8 @@
 services:
+  # --- NODO MAESTRO DE SPARK ---
   spark-master:
     image: bitnami/spark:3.5.1
+    container_name: spark-master
     environment:
       - SPARK_MODE=master
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
@@ -11,4 +13,15 @@ services:
       - "8080:8080" # Interfaz web del Master para ver el estado del clúster
       - "7077:7077" # Puerto de comunicación para los Workers
     volumes:
-      - ./app:/app # Aquí pondremos tu script de Python y el archivo data_masiva.csv
+      - ./app:/app # Aquí pondremos tu script de Python y los archivos de datos
+
+  # --- CLIENTE AUTOMATIZADO (Igual que en Kafka) ---
+  spark-cliente:
+    image: bitnami/spark:3.5.1
+    container_name: spark-cliente
+    volumes:
+      - ./app:/app
+    # Le damos 10 segundos para asegurar que el master levantó bien su puerto 7077
+    command: sh -c "sleep 10 && spark-submit --master spark://10.13.140.92:7077 /app/procesamiento.py"
+    depends_on:
+      - spark-master
